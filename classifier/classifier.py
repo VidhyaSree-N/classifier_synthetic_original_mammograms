@@ -7,8 +7,9 @@ import numpy as np
 import os
 import cv2
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
-class classifier:
+class Classifier:
     def load_data(train_image_folder, train_npz_folder, test_size=0.3, random_state=42):
         image_files = [os.path.join(train_image_folder, f) for f in os.listdir(train_image_folder) if f.endswith('.png')]
         npz_files = [os.path.join(train_npz_folder, f) for f in os.listdir(train_npz_folder) if f.endswith('.npz')]
@@ -90,14 +91,14 @@ class classifier:
         except Exception as e:
             print("An error occurred during training:", str(e))
 
-    def evaluate_model(model, test_generator, batch_size):
+    def evaluate_model(model, test_generator,test_files, batch_size):
         test_loss, test_accuracy = model.evaluate(test_generator, steps=len(test_files) // batch_size)
         print(f"Test Accuracy: {test_accuracy}")
 
-    def display_predictions(self, test_generator):
+    def display_predictions(model, test_generator, test_files,batch_size):
             for i in range(5):
                 test_sample, test_labels = next(test_generator)
-                predictions = self.model.predict(test_sample)
+                predictions = model.predict(test_sample)
 
                 # Display the predicted label
                 plt.subplot(1, 2, 2)
@@ -111,6 +112,6 @@ class classifier:
                 plt.show()
 
             # 1 for Synthetic and 0 for original
-            predictions = self.model.predict(test_generator, steps=len(self.test_files) // self.batch_size, verbose=1)
+            predictions = model.predict(test_generator, steps=len(test_files) // batch_size, verbose=1)
             predicted_labels = np.argmax(predictions, axis=1)
             return predicted_labels
